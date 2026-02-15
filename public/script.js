@@ -57,10 +57,42 @@ const showError = (message) => {
     `;
 };
 
+// Direct download function
+const directDownload = async (url, filename) => {
+    try {
+        const response = await fetch(url);
+        const blob = await response.blob();
+        const blobUrl = window.URL.createObjectURL(blob);
+        
+        const a = document.createElement('a');
+        a.href = blobUrl;
+        a.download = filename;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        window.URL.revokeObjectURL(blobUrl);
+    } catch (error) {
+        console.error('Download error:', error);
+        alert('Download failed. Please try right-click and "Save as"');
+    }
+};
+
 const createDownloadButton = (url, filename, icon, text) => {
-    return `<a href="${url}" class="btn" download="${filename}" target="_blank" rel="noopener">
+    const buttonId = `btn-${Math.random().toString(36).substr(2, 9)}`;
+    
+    setTimeout(() => {
+        const button = document.getElementById(buttonId);
+        if (button) {
+            button.addEventListener('click', (e) => {
+                e.preventDefault();
+                directDownload(url, filename);
+            });
+        }
+    }, 100);
+    
+    return `<button id="${buttonId}" class="btn">
         <i class='bx ${icon}'></i>${text}
-    </a>`;
+    </button>`;
 };
 
 const buildVideoResult = (data) => {
@@ -81,18 +113,18 @@ const buildVideoResult = (data) => {
     `;
 
     const downloadButtons = [
-        createDownloadButton(data.videoUrl, "tiktok-video-hd.mp4", "bx-download", "HD Video")
+        createDownloadButton(data.videoUrl, "TikDL-HD.mp4", "bx-download", " Download HD Video")
     ];
 
     if (data.videoUrlSD && data.videoUrlSD !== data.videoUrl) {
         downloadButtons.push(
-            createDownloadButton(data.videoUrlSD, "tiktok-video.mp4", "bx-download", "SD Video")
+            createDownloadButton(data.videoUrlSD, "TikDL-SD.mp4", "bx-download", " Download SD Video")
         );
     }
 
     if (data.audioUrl) {
         downloadButtons.push(
-            createDownloadButton(data.audioUrl, "tiktok-audio.mp3", "bx-music", " Download Audio")
+            createDownloadButton(data.audioUrl, "TikDL-Audio.mp3", "bx-music", " Download Music")
         );
     }
 
@@ -101,8 +133,8 @@ const buildVideoResult = (data) => {
             <div class="download-options">
                 ${downloadButtons.join('')}
             </div>
-            <p style="font-size: 12px; color: var(--color-text); margin-top: 1rem;">
-                <i class='bx bx-info-circle'></i> Right-click and "Save as" if direct download doesn't work
+            <p style="font-size: 12px; color: var(--color-text-secondary); margin-top: 1rem;">
+                <i class='bx bx-info-circle'></i> Click to download directly
             </p>
         </div>
     `;
