@@ -45,7 +45,7 @@ app.get('/api/download', async (req, res) => {
         console.log('Processing URL:', url);
 
         // Call API
-        const response = await axios.get(`https://api.iherta.my.id/downloader/tiktok?url=${encodeURIComponent(url)}`, {
+        const response = await axios.get(`https://api.ivoid.cfd/downloader/tiktok?url=${encodeURIComponent(url)}`, {
             headers: {
                 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36',
                 'Accept': 'application/json'
@@ -62,12 +62,12 @@ app.get('/api/download', async (req, res) => {
 
         const data = response.data.result;
 
-        // Map response to match original format
+        // Map response to match expected format
         return res.json({
             success: true,
             data: {
                 title: data.title || 'TikTok Video',
-                author: data.music?.author || null,  // Not available in API response
+                author: data.music?.author || null,
                 duration: null,
                 likes: null,
                 videoUrl: data.media?.video_hd || data.media?.video,
