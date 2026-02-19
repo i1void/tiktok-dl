@@ -96,6 +96,8 @@ const createDownloadButton = (url, filename, icon, text) => {
 };
 
 const buildVideoResult = (data) => {
+    const randomId = Math.floor(Math.random() * 1000000000);
+    
     const videoInfo = `
         <div class="video-info">
             <h3>${data.title}</h3>
@@ -113,18 +115,18 @@ const buildVideoResult = (data) => {
     `;
 
     const downloadButtons = [
-        createDownloadButton(data.videoUrl, "TikDL-HD.mp4", "bx-download", " Download HD Video")
+        createDownloadButton(data.videoUrl, `TikDownloaderHD_${randomId}.mp4`, "bx-download", " Download HD Video")
     ];
 
     if (data.videoUrlSD && data.videoUrlSD !== data.videoUrl) {
         downloadButtons.push(
-            createDownloadButton(data.videoUrlSD, "TikDL-SD.mp4", "bx-download", " Download SD Video")
+            createDownloadButton(data.videoUrlSD, `TikDownloaderSD_${randomId}.mp4`, "bx-download", " Download SD Video")
         );
     }
 
     if (data.audioUrl) {
         downloadButtons.push(
-            createDownloadButton(data.audioUrl, "TikDL-Audio.mp3", "bx-music", " Download Music")
+            createDownloadButton(data.audioUrl, `TikDownloaderAudio_${randomId}.mp3`, "bx-music", " Download Music")
         );
     }
 
