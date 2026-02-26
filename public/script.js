@@ -1,15 +1,60 @@
+// Theme Toggle
+const themeToggle = document.getElementById('themeToggle');
+const themeIcon = document.getElementById('themeIcon');
+
+function setTheme(mode) {
+    if (mode === 'light') {
+        document.body.classList.add('light');
+        themeIcon.className = "bx bx-sun";
+        localStorage.setItem('theme', 'light');
+    } else {
+        document.body.classList.remove('light');
+        themeIcon.className = "bx bx-moon";
+        localStorage.setItem('theme', 'dark');
+    }
+}
+
+setTheme(localStorage.getItem('theme') || 'dark');
+
+themeToggle.addEventListener('click', () => {
+    setTheme(document.body.classList.contains('light') ? 'dark' : 'light');
+});
+
+// Burger Menu
+const burgerBtn = document.getElementById('burgerBtn');
+const sideMenu = document.getElementById('sideMenu');
+const menuOverlay = document.getElementById('menuOverlay');
+const closeMenu = document.getElementById('closeMenu');
+
+function openMenu() {
+    sideMenu.classList.add('open');
+    menuOverlay.classList.add('active');
+    document.body.style.overflow = 'hidden';
+}
+
+function closeMenuFn() {
+    sideMenu.classList.remove('open');
+    menuOverlay.classList.remove('active');
+    document.body.style.overflow = '';
+}
+
+burgerBtn.addEventListener('click', openMenu);
+closeMenu.addEventListener('click', closeMenuFn);
+menuOverlay.addEventListener('click', closeMenuFn);
+document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeMenuFn(); });
+
+// Main App
 const form = document.getElementById('form');
 const urlInput = document.getElementById('url');
 const submitBtn = document.getElementById('submit');
 const content = document.getElementById('content');
 
-// Constants
 const INSTRUCTIONS_HTML = `
     <ol>
-        <li>Copy link of some tiktok video</li>
-        <li>Paste link in text box</li>
-        <li>Click the <b>GENERATE</b> button</li>
-        <li>Watch and Download the video without watermark</li>
+        <li>Copy a link from <b>TikTok</b></li>
+        <li>Paste it in the box above</li>
+        <li>Click <b>GENERATE</b></li>
+        <li>Download your video without watermark ✓</li>
     </ol>
 `;
 
@@ -23,47 +68,46 @@ const TIKTOK_PATTERNS = [
     /tiktok\.com\/.*\/video\/\d+/
 ];
 
-// Utility functions
 const formatNumber = (num) => {
     if (num >= 1000000) return (num / 1000000).toFixed(1) + 'M';
     if (num >= 1000) return (num / 1000).toFixed(1) + 'K';
     return num.toString();
 };
 
-const isValidTikTokUrl = (url) => {
-    return TIKTOK_PATTERNS.some(pattern => pattern.test(url));
-};
-
-const showInstructions = () => {
-    content.innerHTML = INSTRUCTIONS_HTML;
-};
+const isValidTikTokUrl = (url) => TIKTOK_PATTERNS.some(p => p.test(url));
+const showInstructions = () => { content.innerHTML = INSTRUCTIONS_HTML; };
 
 const showLoading = () => {
     content.innerHTML = `
         <div class="loading">
-            <div class="spinner"></div>
-            <p>Processing your TikTok video...</p>
+            <div class="loading-label">Processing</div>
+            <div class="loading-bar-wrap">
+                <div class="loading-bar"></div>
+            </div>
+            <div class="loading-dots">
+                <span></span><span></span><span></span>
+            </div>
         </div>
     `;
 };
 
 const showError = (message) => {
     content.innerHTML = `
-        <div class="messageError">
-            <i class='bx bx-error-circle'></i>
-            <p>${message}</p>
+        <div style="width:100%">
+            <div class="messageError">
+                <i class='bx bx-error-circle'></i>
+                <span>${message}</span>
+            </div>
+            ${INSTRUCTIONS_HTML}
         </div>
-        ${INSTRUCTIONS_HTML}
     `;
 };
 
-// Direct download function
 const directDownload = async (url, filename) => {
     try {
         const response = await fetch(url);
         const blob = await response.blob();
         const blobUrl = window.URL.createObjectURL(blob);
-        
         const a = document.createElement('a');
         a.href = blobUrl;
         a.download = filename;
@@ -77,121 +121,107 @@ const directDownload = async (url, filename) => {
     }
 };
 
-const createDownloadButton = (url, filename, icon, text) => {
+const createDownloadButton = (url, filename, icon, text, extraClass = '') => {
     const buttonId = `btn-${Math.random().toString(36).substr(2, 9)}`;
-    
     setTimeout(() => {
-        const button = document.getElementById(buttonId);
-        if (button) {
-            button.addEventListener('click', (e) => {
-                e.preventDefault();
-                directDownload(url, filename);
-            });
-        }
+        const btn = document.getElementById(buttonId);
+        if (btn) btn.addEventListener('click', (e) => { e.preventDefault(); directDownload(url, filename); });
     }, 100);
-    
-    return `<button id="${buttonId}" class="btn">
+    return `<button id="${buttonId}" class="btn ${extraClass}">
         <i class='bx ${icon}'></i>${text}
     </button>`;
 };
 
 const buildVideoResult = (data) => {
     const randomId = Math.floor(Math.random() * 1000000000);
-    
+
     const videoInfo = `
         <div class="video-info">
-            <h3>${data.title}</h3>
-            ${data.author ? `<p><strong>Author:</strong> @${data.author}</p>` : ''}
-            ${data.duration ? `<p><strong>Duration:</strong> ${data.duration}s</p>` : ''}
-            ${data.likes ? `<p><strong>Likes:</strong> ${formatNumber(data.likes)}</p>` : ''}
+            <h3>${data.title || 'TikTok Video'}</h3>
+            ${data.author ? `<p><i class='bx bx-user'></i> @${data.author}</p>` : ''}
+            ${data.duration ? `<p><i class='bx bx-time'></i> ${data.duration}s</p>` : ''}
+            ${data.likes ? `<p><i class='bx bx-heart'></i> ${formatNumber(data.likes)}</p>` : ''}
         </div>
     `;
 
-    const videoPlayer = `
-        <video controls crossorigin="anonymous" preload="metadata">
-            <source src="${data.videoUrl}" type="video/mp4">
-            Your browser does not support the video tag.
-        </video>
-    `;
+    const videoPlayer = data.videoUrl ? `
+        <div class="video-container">
+            <video controls crossorigin="anonymous" preload="metadata">
+                <source src="${data.videoUrl}" type="video/mp4">
+            </video>
+        </div>
+    ` : '';
 
-    const downloadButtons = [
-        createDownloadButton(data.videoUrl, `TikDownloaderHD_${randomId}.mp4`, "bx-download", " Download HD Video")
-    ];
+    const buttons = [];
+
+    if (data.videoUrl) {
+        buttons.push(createDownloadButton(
+            data.videoUrl, `TikDL_HD_${randomId}.mp4`,
+            "bx-download", " Download HD", "btn-hd"
+        ));
+    }
 
     if (data.videoUrlSD && data.videoUrlSD !== data.videoUrl) {
-        downloadButtons.push(
-            createDownloadButton(data.videoUrlSD, `TikDownloaderSD_${randomId}.mp4`, "bx-download", " Download SD Video")
-        );
+        buttons.push(createDownloadButton(
+            data.videoUrlSD, `TikDL_SD_${randomId}.mp4`,
+            "bx-download", " Download SD"
+        ));
     }
 
     if (data.audioUrl) {
-        downloadButtons.push(
-            createDownloadButton(data.audioUrl, `TikDownloaderAudio_${randomId}.mp3`, "bx-music", " Download Music")
-        );
+        buttons.push(createDownloadButton(
+            data.audioUrl, `TikDL_Audio_${randomId}.mp3`,
+            "bx-music", " Audio Only"
+        ));
     }
 
     const downloadSection = `
         <div class="download-section">
-            <div class="download-options">
-                ${downloadButtons.join('')}
-            </div>
-            <p style="font-size: 12px; color: var(--color-text-secondary); margin-top: 1rem;">
-                <i class='bx bx-info-circle'></i> Click to download directly
-            </p>
+            <div class="download-options">${buttons.join('')}</div>
+            <p class="download-hint"><i class='bx bx-info-circle'></i> Tap to download directly</p>
         </div>
     `;
 
-    return videoInfo + videoPlayer + downloadSection;
+    return `<div class="result-wrap">${videoInfo}${videoPlayer}${downloadSection}</div>`;
 };
 
-// Main download function
 const downloadTikTokVideo = async (url) => {
     try {
         showLoading();
         submitBtn.disabled = true;
 
-        console.log('Processing URL:', url);
-
         const response = await fetch(`/api/download?url=${encodeURIComponent(url)}`);
-        const result = await response.json();
+        const text = await response.text();
+        let result;
+        try {
+            result = JSON.parse(text);
+        } catch {
+            throw new Error('Server returned an unexpected response. Please try again.');
+        }
 
         if (result.success && result.data) {
             content.innerHTML = buildVideoResult(result.data);
         } else {
-            showError(result.message || 'Unable to fetch video. Please try again or check if the video is public.');
+            showError(result.message || 'Unable to fetch video. Make sure the video is public.');
         }
-
     } catch (error) {
         console.error('Error:', error);
-        showError(`Failed to process video: ${error.message}. Please try again or check your internet connection.`);
+        showError(error.message || 'Failed to process. Please check your internet connection.');
     } finally {
         submitBtn.disabled = false;
     }
 };
 
-// Event listeners
 form.addEventListener('submit', async (e) => {
     e.preventDefault();
-    
     const url = urlInput.value.trim();
-    
-    if (!url) {
-        showError('Please enter a TikTok URL');
-        return;
-    }
-
-    if (!isValidTikTokUrl(url)) {
-        showError('Please enter a valid TikTok URL');
-        return;
-    }
-
+    if (!url) { showError('Please enter a TikTok URL'); return; }
+    if (!isValidTikTokUrl(url)) { showError('Please enter a valid TikTok URL'); return; }
     await downloadTikTokVideo(url);
 });
 
 urlInput.addEventListener('focus', () => {
-    if (content.querySelector('.messageError')) {
-        showInstructions();
-    }
+    if (content.querySelector('.messageError')) showInstructions();
 });
 
 urlInput.addEventListener('paste', (e) => {

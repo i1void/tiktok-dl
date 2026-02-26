@@ -2,32 +2,110 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="description" content="Download Videos of Tiktok no watermark. Free and Easy!">
-    <meta name="keywords" content="HTML, CSS, JavaScript, tiktok, watermark. tiktokhd">
+    <meta name="description" content="Download TikTok videos without watermark. Free and Easy!">
+    <meta name="keywords" content="tiktok downloader, tiktok no watermark, tiktok hd download">
     <meta name="author" content="1void">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tiktok DL | Download Tiktok videos HD without watermark.</title>
+    <title>TikDL | Download TikTok Videos HD without watermark</title>
     <link rel="icon" type="image/png" href="icon/icon.png">
     <link rel="stylesheet" href="style.css">
     <link href='https://unpkg.com/boxicons@2.1.2/css/boxicons.min.css' rel='stylesheet'>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 </head>
 <body>
-    
+
+    <!-- Overlay -->
+    <div class="menu-overlay" id="menuOverlay"></div>
+
+    <!-- Side Menu -->
+    <nav class="side-menu" id="sideMenu">
+        <div class="side-menu-header">
+            <span class="side-menu-title">Menu</span>
+            <button class="close-btn" id="closeMenu" aria-label="Close menu">
+                <i class='bx bx-x'></i>
+            </button>
+        </div>
+        <div class="side-menu-body">
+            <div class="menu-section">
+                <p class="menu-section-label">Tools</p>
+                <a href="/" class="menu-item active">
+                    <i class='bx bxl-tiktok'></i>
+                    <span>TikTok Downloader</span>
+                    <span class="menu-badge">You're here</span>
+                </a>
+                <a href="https://igdl.herta.web.id" target="_blank" class="menu-item">
+                    <i class='bx bxl-instagram'></i>
+                    <span>Instagram Downloader</span>
+                    <i class='bx bx-link-external menu-external'></i>
+                </a>
+            </div>
+            <div class="menu-section">
+                <p class="menu-section-label">About</p>
+                <div class="about-card">
+                    <div class="about-logo">
+                        <i class='bx bxl-tiktok'></i>
+                        <span>TikDL</span>
+                    </div>
+                    <p class="about-desc">
+                        Download TikTok videos in HD without watermark — fast, free, no login required.
+                    </p>
+                    <div class="about-version">
+                        <span>Version</span>
+                        <span class="version-badge">v2.0.0</span>
+                    </div>
+                    <div class="about-divider"></div>
+                    <p class="about-desc" style="margin-bottom:0.5rem;">
+                        Also try our <strong>Instagram Downloader</strong> — download Reels & Photos too.
+                    </p>
+                    <a href="https://igdl.herta.web.id" target="_blank" class="about-ig-link">
+                        <i class='bx bxl-instagram'></i>
+                        igdl.herta.web.id
+                        <i class='bx bx-link-external'></i>
+                    </a>
+                    <div class="about-divider"></div>
+                    <p class="about-footer">
+                        Built with ❤️ by <a href="https://github.com/i1void" target="_blank"><strong>1void</strong></a>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Topbar -->
+    <header class="topbar">
+        <button class="burger-btn" id="burgerBtn" aria-label="Open menu">
+            <span></span><span></span><span></span>
+        </button>
+        <div class="topbar-brand">
+            <i class='bx bxl-tiktok'></i>
+            <span>Tik<b>DL</b></span>
+        </div>
+        <div class="topbar-actions">
+            <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme">
+                <i class='bx bx-moon' id="themeIcon"></i>
+            </button>
+        </div>
+    </header>
+
     <main id="app" class="container">
         <div class="card">
-            <h2>Insert a valid link of <b>TikTok</b></h2>
+            <div class="card-eyebrow">
+                <i class='bx bxl-tiktok'></i>
+                TikTok Downloader
+            </div>
+            <h2>Paste a <b>TikTok</b> link to download</h2>
+            <p class="card-sub">HD Videos & Audio — no watermark, no login</p>
             <form id="form">
-                <input type="url" name="url" id="url" placeholder="paste the link of the tiktok video...">
-                <!-- <button id="submit" type="submit" class="btn-submit">GENERATE</button> -->
+                <input type="url" name="url" id="url" placeholder="https://www.tiktok.com/@user/video/...">
                 <input type="submit" id="submit" class="btn-submit" value="GENERATE">
             </form>
             <div id="content" class="content">
                 <ol>
-                    <li>Copy link of some tiktok video</li>
-                    <li>Paste link in text box</li>
-                    <li>Click the <b>GENERATE</b> button</li>
-                    <li>Watch and Download the video without watermark</li>
+                    <li>Copy a link from <b>TikTok</b></li>
+                    <li>Paste it in the box above</li>
+                    <li>Click <b>GENERATE</b></li>
+                    <li>Download your video without watermark ✓</li>
                 </ol>
             </div>
         </div>
@@ -36,7 +114,7 @@
     <footer>
         <a class="btn-script" href="https://github.com/i1void" target="_blank">
             <h3>Created by <b>1void</b></h3>
-            <p>App build v2.0.0</p>
+            <p>TikDL v2.0.0</p>
         </a>
     </footer>
 
