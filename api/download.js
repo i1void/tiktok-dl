@@ -62,18 +62,36 @@ app.get('/api/download', async (req, res) => {
 
         const data = response.data.result;
 
+        // Detect slideshow/photo posts (TikTok "images" carousel instead of a video)
+        // NOTE: field names below cover the most common shapes returned by
+        // TikTok downloader APIs. If your slide links come back empty, log
+        // `data` here for a real slideshow URL and adjust the keys below.
+        const rawImages =
+            data.images ||
+            data.media?.images ||
+            data.slides ||
+            (Array.isArray(data.media) ? data.media : null);
+
+        const isSlideshow = data.type === 'image' || data.type === 'slide' || (Array.isArray(rawImages) && rawImages.length > 0);
+
+        const images = isSlideshow
+            ? (rawImages || []).map(img => (typeof img === 'string' ? img : img.url || img.image || img.src)).filter(Boolean)
+            : null;
+
         // Map response to match expected format
         return res.json({
             success: true,
             data: {
+                type: isSlideshow ? 'image' : 'video',
                 title: data.title || 'TikTok Video',
                 author: data.music?.author || null,
                 duration: null,
                 likes: null,
-                videoUrl: data.media?.video_hd || data.media?.video,
-                videoUrlSD: data.media?.video,
+                videoUrl: isSlideshow ? null : (data.media?.video_hd || data.media?.video),
+                videoUrlSD: isSlideshow ? null : data.media?.video,
                 audioUrl: data.music?.url || null,
-                thumbnail: null
+                thumbnail: data.thumbnail || data.cover || null,
+                images
             }
         });
 
