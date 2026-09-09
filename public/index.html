@@ -83,7 +83,12 @@
             <h2>Paste a <b>TikTok</b> link to download</h2>
             <p class="card-sub">HD Videos & Audio — no watermark, no login</p>
             <form id="form">
-                <input type="url" name="url" id="url" placeholder="https://www.tiktok.com/@user/video/...">
+                <div class="input-group">
+                    <input type="url" name="url" id="url" placeholder="https://www.tiktok.com/@user/video/...">
+                    <button type="button" id="pasteBtn" class="btn-paste" aria-label="Paste from clipboard">
+                        <i class='bx bx-paste'></i>
+                    </button>
+                </div>
                 <input type="submit" id="submit" class="btn-submit" value="GENERATE">
             </form>
             <div id="content" class="content">

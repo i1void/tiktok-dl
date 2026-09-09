@@ -103,10 +103,36 @@ const showError = (message) => {
     `;
 };
 
-const directDownload = async (url, filename) => {
+const formatBytes = (bytes) => {
+    if (!bytes) return '0 KB';
+    if (bytes >= 1048576) return (bytes / 1048576).toFixed(1) + ' MB';
+    return (bytes / 1024).toFixed(0) + ' KB';
+};
+
+const directDownload = async (url, filename, onProgress) => {
     try {
         const response = await fetch(url);
-        const blob = await response.blob();
+        if (!response.ok || !response.body) throw new Error('Bad response');
+
+        const contentLength = response.headers.get('content-length');
+        const total = contentLength ? parseInt(contentLength, 10) : 0;
+        let loaded = 0;
+
+        const reader = response.body.getReader();
+        const chunks = [];
+
+        while (true) {
+            const { done, value } = await reader.read();
+            if (done) break;
+            chunks.push(value);
+            loaded += value.length;
+            if (onProgress) {
+                const percent = total ? Math.round((loaded / total) * 100) : null;
+                onProgress(percent, loaded);
+            }
+        }
+
+        const blob = new Blob(chunks);
         const blobUrl = window.URL.createObjectURL(blob);
         const a = document.createElement('a');
         a.href = blobUrl;
@@ -115,34 +141,157 @@ const directDownload = async (url, filename) => {
         a.click();
         document.body.removeChild(a);
         window.URL.revokeObjectURL(blobUrl);
+        if (onProgress) onProgress(100, loaded);
     } catch (error) {
         console.error('Download error:', error);
         alert('Download failed. Please try right-click and "Save as"');
+        if (onProgress) onProgress(null, 0, true);
     }
 };
 
 const createDownloadButton = (url, filename, icon, text, extraClass = '') => {
-    const buttonId = `btn-${Math.random().toString(36).substr(2, 9)}`;
+    const uid = Math.random().toString(36).substr(2, 9);
+    const buttonId = `btn-${uid}`;
+    const barId = `bar-${uid}`;
+    const wrapId = `wrap-${uid}`;
+    const labelId = `label-${uid}`;
+
     setTimeout(() => {
         const btn = document.getElementById(buttonId);
-        if (btn) btn.addEventListener('click', (e) => { e.preventDefault(); directDownload(url, filename); });
+        const wrap = document.getElementById(wrapId);
+        const bar = document.getElementById(barId);
+        const label = document.getElementById(labelId);
+        if (!btn) return;
+
+        btn.addEventListener('click', async (e) => {
+            e.preventDefault();
+            if (btn.disabled) return;
+            btn.disabled = true;
+            wrap.classList.add('active');
+            label.classList.add('active');
+            bar.classList.add('indeterminate');
+            label.textContent = 'Starting…';
+
+            await directDownload(url, filename, (percent, loaded, failed) => {
+                if (failed) {
+                    label.textContent = 'Download failed';
+                    bar.classList.remove('indeterminate');
+                    btn.disabled = false;
+                    return;
+                }
+                if (percent === null) {
+                    label.textContent = `Downloading… ${formatBytes(loaded)}`;
+                } else {
+                    bar.classList.remove('indeterminate');
+                    bar.style.width = percent + '%';
+                    label.textContent = percent < 100 ? `Downloading… ${percent}%` : 'Done ✓';
+                }
+                if (percent === 100) {
+                    btn.disabled = false;
+                    setTimeout(() => {
+                        wrap.classList.remove('active');
+                        label.classList.remove('active');
+                        bar.style.width = '0%';
+                    }, 1200);
+                }
+            });
+        });
     }, 100);
-    return `<button id="${buttonId}" class="btn ${extraClass}">
-        <i class='bx ${icon}'></i>${text}
+
+    return `<div class="download-item">
+        <button id="${buttonId}" class="btn ${extraClass}">
+            <i class='bx ${icon}'></i>${text}
+        </button>
+        <div class="dl-progress-wrap" id="${wrapId}"><div class="dl-progress-bar" id="${barId}"></div></div>
+        <div class="dl-progress-label" id="${labelId}"></div>
+    </div>`;
+};
+
+const buildInfoBlock = (data) => `
+    <div class="video-info">
+        <h3>${data.title || 'TikTok Video'}</h3>
+        ${data.author ? `<p><i class='bx bx-user'></i> @${data.author}</p>` : ''}
+        ${data.duration ? `<p><i class='bx bx-time'></i> ${data.duration}s</p>` : ''}
+        ${data.likes ? `<p><i class='bx bx-heart'></i> ${formatNumber(data.likes)}</p>` : ''}
+    </div>
+`;
+
+const buildPhotoResult = (data) => {
+    const randomId = Math.floor(Math.random() * 1000000000);
+    const images = data.images || [];
+
+    const gallery = `
+        <div class="photo-gallery">
+            ${images.map((img, i) => `
+                <div class="photo-item">
+                    <img src="${img}" alt="Slide ${i + 1}" loading="lazy">
+                    <button class="btn-photo-dl" data-url="${img}" data-name="TikDL_Slide_${randomId}_${i + 1}.jpg" aria-label="Download slide ${i + 1}">
+                        <i class='bx bx-download'></i>
+                    </button>
+                </div>
+            `).join('')}
+        </div>
+    `;
+
+    const buttons = [];
+
+    buttons.push(createDownloadAllPhotosButton(images, randomId));
+
+    if (data.audioUrl) {
+        buttons.push(createDownloadButton(
+            data.audioUrl, `TikDL_Audio_${randomId}.mp3`,
+            "bx-music", " Audio Only"
+        ));
+    }
+
+    const downloadSection = `
+        <div class="download-section">
+            <div class="download-options">${buttons.join('')}</div>
+            <p class="download-hint"><i class='bx bx-info-circle'></i> Tap a slide to download it individually</p>
+        </div>
+    `;
+
+    return `<div class="result-wrap">${buildInfoBlock(data)}${gallery}${downloadSection}</div>`;
+};
+
+const createDownloadAllPhotosButton = (images, randomId) => {
+    const buttonId = `btn-all-${randomId}`;
+    setTimeout(() => {
+        const btn = document.getElementById(buttonId);
+        if (!btn) return;
+        btn.addEventListener('click', async (e) => {
+            e.preventDefault();
+            btn.disabled = true;
+            const originalText = btn.innerHTML;
+            for (let i = 0; i < images.length; i++) {
+                btn.innerHTML = `<i class='bx bx-download'></i> Downloading ${i + 1}/${images.length}…`;
+                await directDownload(images[i], `TikDL_Slide_${randomId}_${i + 1}.jpg`);
+                await new Promise(r => setTimeout(r, 400)); // avoid browser blocking multi-downloads
+            }
+            btn.innerHTML = originalText;
+            btn.disabled = false;
+        });
+    }, 100);
+    return `<button id="${buttonId}" class="btn btn-hd">
+        <i class='bx bx-download'></i> Download All (${images.length})
     </button>`;
 };
 
-const buildVideoResult = (data) => {
-    const randomId = Math.floor(Math.random() * 1000000000);
+// Event delegation for individual slide download buttons
+document.getElementById('content').addEventListener('click', (e) => {
+    const btn = e.target.closest('.btn-photo-dl');
+    if (!btn) return;
+    e.preventDefault();
+    directDownload(btn.dataset.url, btn.dataset.name);
+});
 
-    const videoInfo = `
-        <div class="video-info">
-            <h3>${data.title || 'TikTok Video'}</h3>
-            ${data.author ? `<p><i class='bx bx-user'></i> @${data.author}</p>` : ''}
-            ${data.duration ? `<p><i class='bx bx-time'></i> ${data.duration}s</p>` : ''}
-            ${data.likes ? `<p><i class='bx bx-heart'></i> ${formatNumber(data.likes)}</p>` : ''}
-        </div>
-    `;
+const buildVideoResult = (data) => {
+    if (data.type === 'image' && Array.isArray(data.images) && data.images.length > 0) {
+        return buildPhotoResult(data);
+    }
+
+    const randomId = Math.floor(Math.random() * 1000000000);
+    const videoInfo = buildInfoBlock(data);
 
     const videoPlayer = data.videoUrl ? `
         <div class="video-container">
@@ -222,6 +371,33 @@ form.addEventListener('submit', async (e) => {
 
 urlInput.addEventListener('focus', () => {
     if (content.querySelector('.messageError')) showInstructions();
+});
+
+// Paste Button
+const pasteBtn = document.getElementById('pasteBtn');
+
+pasteBtn.addEventListener('click', async () => {
+    try {
+        const text = await navigator.clipboard.readText();
+        if (!text) return;
+        urlInput.value = text.trim();
+        urlInput.focus();
+
+        pasteBtn.classList.add('pasted');
+        const icon = pasteBtn.querySelector('i');
+        icon.className = 'bx bx-check';
+        setTimeout(() => {
+            icon.className = 'bx bx-paste';
+            pasteBtn.classList.remove('pasted');
+        }, 1000);
+
+        if (isValidTikTokUrl(urlInput.value.trim())) {
+            form.dispatchEvent(new Event('submit'));
+        }
+    } catch (error) {
+        console.error('Clipboard read failed:', error);
+        showError('Could not access clipboard. Please paste manually.');
+    }
 });
 
 urlInput.addEventListener('paste', (e) => {
