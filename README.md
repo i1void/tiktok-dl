@@ -34,6 +34,10 @@ npm start
 GET /api/download?url=<tiktok_url>
 ```
 
+## Powered By
+
+This app uses the [Herta API](https://herta-api.vercel.app) REST API to fetch and process TikTok video data.
+
 ## Supported TikTok URL Formats
 
 - `tiktok.com/@username/video/123456`
