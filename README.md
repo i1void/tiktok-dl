@@ -2,6 +2,12 @@
 
 Simple web application to download TikTok videos without watermark.
 
+[![GitHub stars](https://img.shields.io/github/stars/i1void/tiktok-dl?style=flat-square&color=ff5e5b)](https://github.com/i1void/tiktok-dl/stargazers)
+[![GitHub forks](https://img.shields.io/github/forks/i1void/tiktok-dl?style=flat-square)](https://github.com/i1void/tiktok-dl/network/members)
+[![License](https://img.shields.io/github/license/i1void/tiktok-dl?style=flat-square)](LICENSE)
+
+> If this tool saved you some time, consider dropping a ⭐ — it genuinely helps the project get noticed, and it's free :)
+
 ## Features
 
 - Download TikTok HD videos without watermark
@@ -14,7 +20,7 @@ Simple web application to download TikTok videos without watermark.
 
 ```bash
 # Clone repository
-git clone https://github.com/111void/tiktok-dl.git
+git clone https://github.com/i1void/tiktok-dl.git
 cd tiktok-dl
 
 # Install dependencies
