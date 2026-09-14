@@ -36,7 +36,7 @@ GET /api/download?url=<tiktok_url>
 
 ## Powered By
 
-This app uses the [Herta API](https://herta-api.vercel.app) REST API to fetch and process TikTok video data.
+This app uses the [Void API](https://nodtvoid-api.vercel.app/) REST API to fetch and process TikTok video data.
 
 ## Supported TikTok URL Formats
 
