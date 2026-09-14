@@ -238,6 +238,18 @@ body {
     box-shadow: 2px 2px 0px #c73d3a;
 }
 
+.menu-item-trakteer {
+    border-color: #ff2a2f;
+    color: #ff2a2f;
+}
+
+.menu-item-trakteer:hover {
+    border-color: #ff2a2f;
+    background: #ff2a2f;
+    color: #fff;
+    box-shadow: 2px 2px 0px #b3181c;
+}
+
 .menu-badge {
     font-size: 0.6rem;
     font-weight: 700;
