@@ -226,6 +226,18 @@ body {
 .menu-item i { font-size: 1.1rem; flex-shrink: 0; }
 .menu-item span:nth-child(2) { flex: 1; }
 
+.menu-item-donate {
+    border-color: #ff5e5b;
+    color: #ff5e5b;
+}
+
+.menu-item-donate:hover {
+    border-color: #ff5e5b;
+    background: #ff5e5b;
+    color: #fff;
+    box-shadow: 2px 2px 0px #c73d3a;
+}
+
 .menu-badge {
     font-size: 0.6rem;
     font-weight: 700;
