@@ -45,7 +45,7 @@ app.get('/api/download', async (req, res) => {
         console.log('Processing URL:', url);
 
         // Call API
-        const response = await axios.get(`https://herta-api.vercel.app//downloader/tiktok?url=${encodeURIComponent(url)}`, {
+        const response = await axios.get(`https://herta-api.vercel.app/downloader/tiktok?url=${encodeURIComponent(url)}`, {
             headers: {
                 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36',
                 'Accept': 'application/json'
