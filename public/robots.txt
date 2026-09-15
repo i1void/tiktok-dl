@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://tiktok-dl-nu.vercel.app/sitemap.xml
