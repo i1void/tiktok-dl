@@ -14,7 +14,7 @@ function setTheme(mode) {
     }
 }
 
-setTheme(localStorage.getItem('theme') || 'dark');
+setTheme(localStorage.getItem('theme') || 'light');
 
 themeToggle.addEventListener('click', () => {
     setTheme(document.body.classList.contains('light') ? 'dark' : 'light');
