@@ -12,7 +12,7 @@
     <link rel="icon" type="image/png" href="icon/icon.png">
     <link rel="stylesheet" href="style.css">
     <link href='https://unpkg.com/boxicons@2.1.2/css/boxicons.min.css' rel='stylesheet'>
-    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@400;500;600;800&display=swap" rel="stylesheet">
 </head>
 <body>
 
@@ -87,24 +87,49 @@
     </header>
 
     <section class="hero">
-        <div class="wrap">
-            <div class="card-eyebrow">
-                <i class='bx bxl-tiktok'></i>
-                TikTok Downloader
+        <div class="hero-grid">
+            <div class="hero-main">
+                <div class="card-eyebrow">[ TikTok Downloader ]</div>
+                <h2>TIKTOK<br>.DL</h2>
+                <p class="card-sub">TikDL is a TikTok downloader.<br>No watermark. No login.</p>
+                <p class="hero-note">Paste a public link, hit the button, and save the video, the audio, or every slide of a photo post.</p>
+                <form id="form">
+                    <div class="input-group">
+                        <input type="url" name="url" id="url" placeholder="https://www.tiktok.com/@user/video/...">
+                        <button type="button" id="pasteBtn" class="btn-paste" aria-label="Paste from clipboard">
+                            <i class='bx bx-paste'></i>
+                        </button>
+                    </div>
+                    <input type="submit" id="submit" class="btn-submit" value="GET__FILE">
+                </form>
             </div>
-            <h2>Paste a <b>TikTok</b> link.<br>Get the file.</h2>
-            <p class="card-sub">HD video &amp; audio. No watermark, no login.</p>
-            <form id="form">
-                <div class="input-group">
-                    <input type="url" name="url" id="url" placeholder="https://www.tiktok.com/@user/video/...">
-                    <button type="button" id="pasteBtn" class="btn-paste" aria-label="Paste from clipboard">
-                        <i class='bx bx-paste'></i>
-                    </button>
+            <aside class="specs">
+                <div class="spec">
+                    <h4>Formats</h4>
+                    <ul>
+                        <li>Video HD and SD (.mp4)</li>
+                        <li>Audio only (.mp3)</li>
+                        <li>Photo slides (.jpg), one by one or all</li>
+                    </ul>
                 </div>
-                <input type="submit" id="submit" class="btn-submit" value="GENERATE">
-            </form>
+                <div class="spec">
+                    <h4>Rules</h4>
+                    <ul>
+                        <li>No watermark.</li>
+                        <li>No login. No install.</li>
+                        <li>Public videos only.</li>
+                    </ul>
+                </div>
+            </aside>
         </div>
     </section>
+
+    <div class="strip" aria-hidden="true">
+        <div class="strip-track">
+            <span>[ NO WATERMARK ]</span><span>✳</span><span>[ HD ]</span><span>✳</span><span>[ NO LOGIN ]</span><span>✳</span><span>[ MP4 / MP3 / JPG ]</span><span>✳</span>
+            <span>[ NO WATERMARK ]</span><span>✳</span><span>[ HD ]</span><span>✳</span><span>[ NO LOGIN ]</span><span>✳</span><span>[ MP4 / MP3 / JPG ]</span><span>✳</span>
+        </div>
+    </div>
 
     <main id="app" class="container">
         <div id="content" class="content">
