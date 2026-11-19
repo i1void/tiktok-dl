@@ -1,1 +1,5 @@
-{}
+{
+  "rewrites": [
+    { "source": "/health", "destination": "/api/download" }
+  ]
+}
