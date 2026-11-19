@@ -1,47 +1,17 @@
 // Theme Toggle
 const themeToggle = document.getElementById('themeToggle');
-const themeIcon = document.getElementById('themeIcon');
 
 function setTheme(mode) {
-    if (mode === 'light') {
-        document.body.classList.add('light');
-        themeIcon.className = "bx bx-sun";
-        localStorage.setItem('theme', 'light');
-    } else {
-        document.body.classList.remove('light');
-        themeIcon.className = "bx bx-moon";
-        localStorage.setItem('theme', 'dark');
-    }
+    document.documentElement.dataset.theme = mode;
+    themeToggle.textContent = mode === 'dark' ? 'Light' : 'Dark';
+    try { localStorage.setItem('theme', mode); } catch (e) {}
 }
 
-setTheme(localStorage.getItem('theme') || 'light');
+themeToggle.textContent = document.documentElement.dataset.theme === 'dark' ? 'Light' : 'Dark';
 
 themeToggle.addEventListener('click', () => {
-    setTheme(document.body.classList.contains('light') ? 'dark' : 'light');
+    setTheme(document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark');
 });
-
-// Burger Menu
-const burgerBtn = document.getElementById('burgerBtn');
-const sideMenu = document.getElementById('sideMenu');
-const menuOverlay = document.getElementById('menuOverlay');
-const closeMenu = document.getElementById('closeMenu');
-
-function openMenu() {
-    sideMenu.classList.add('open');
-    menuOverlay.classList.add('active');
-    document.body.style.overflow = 'hidden';
-}
-
-function closeMenuFn() {
-    sideMenu.classList.remove('open');
-    menuOverlay.classList.remove('active');
-    document.body.style.overflow = '';
-}
-
-burgerBtn.addEventListener('click', openMenu);
-closeMenu.addEventListener('click', closeMenuFn);
-menuOverlay.addEventListener('click', closeMenuFn);
-document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeMenuFn(); });
 
 // Main App
 const form = document.getElementById('form');
@@ -49,14 +19,11 @@ const urlInput = document.getElementById('url');
 const submitBtn = document.getElementById('submit');
 const content = document.getElementById('content');
 
-const INSTRUCTIONS_HTML = `
-    <ol>
-        <li>Copy a link from <b>TikTok</b></li>
-        <li>Paste it in the box above</li>
-        <li>Click <b>GENERATE</b></li>
-        <li>Download your video without watermark ✓</li>
-    </ol>
-`;
+const HINT_HTML = `<p class="hint">Works with public videos and photo posts.</p>`;
+
+const escapeHtml = (str) => String(str).replace(/[&<>"']/g, (c) => ({
+    '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+}[c]));
 
 const TIKTOK_HOSTS = ['tiktok.com', 'www.tiktok.com', 'm.tiktok.com', 'vm.tiktok.com', 'vt.tiktok.com'];
 const TIKTOK_PATHS = [
@@ -81,32 +48,19 @@ const isValidTikTokUrl = (input) => {
     if (TIKTOK_PATHS.some(re => re.test(u.pathname))) return true;
     return (host === 'vm.tiktok.com' || host === 'vt.tiktok.com') && TIKTOK_SHORT_PATH.test(u.pathname);
 };
-const showInstructions = () => { content.innerHTML = INSTRUCTIONS_HTML; };
+const showInstructions = () => { content.innerHTML = HINT_HTML; };
 
 const showLoading = () => {
     content.innerHTML = `
         <div class="loading">
-            <div class="loading-label">Processing</div>
-            <div class="loading-bar-wrap">
-                <div class="loading-bar"></div>
-            </div>
-            <div class="loading-dots">
-                <span></span><span></span><span></span>
-            </div>
+            <div class="loading-label">Processing…</div>
+            <div class="loading-bar-wrap"><div class="loading-bar"></div></div>
         </div>
     `;
 };
 
 const showError = (message) => {
-    content.innerHTML = `
-        <div style="width:100%">
-            <div class="messageError">
-                <i class='bx bx-error-circle'></i>
-                <span>${message}</span>
-            </div>
-            ${INSTRUCTIONS_HTML}
-        </div>
-    `;
+    content.innerHTML = `<div class="messageError">${escapeHtml(message)}</div>`;
 };
 
 const formatBytes = (bytes) => {
@@ -150,12 +104,12 @@ const directDownload = async (url, filename, onProgress) => {
         if (onProgress) onProgress(100, loaded);
     } catch (error) {
         console.error('Download error:', error);
-        alert('Download failed. Please try right-click and "Save as"');
+        alert('Download failed. Try again, or long-press the file and choose Save.');
         if (onProgress) onProgress(null, 0, true);
     }
 };
 
-const createDownloadButton = (url, filename, icon, text, extraClass = '') => {
+const createDownloadButton = (url, filename, text, extraClass = '') => {
     const uid = Math.random().toString(36).substr(2, 9);
     const buttonId = `btn-${uid}`;
     const barId = `bar-${uid}`;
@@ -206,7 +160,7 @@ const createDownloadButton = (url, filename, icon, text, extraClass = '') => {
 
     return `<div class="download-item">
         <button id="${buttonId}" class="btn ${extraClass}">
-            <i class='bx ${icon}'></i>${text}
+            ${text}
         </button>
         <div class="dl-progress-wrap" id="${wrapId}"><div class="dl-progress-bar" id="${barId}"></div></div>
         <div class="dl-progress-label" id="${labelId}"></div>
@@ -215,10 +169,10 @@ const createDownloadButton = (url, filename, icon, text, extraClass = '') => {
 
 const buildInfoBlock = (data) => `
     <div class="video-info">
-        <h3>${data.title || 'TikTok Video'}</h3>
-        ${data.author ? `<p><i class='bx bx-user'></i> @${data.author}</p>` : ''}
-        ${data.duration ? `<p><i class='bx bx-time'></i> ${data.duration}s</p>` : ''}
-        ${data.likes ? `<p><i class='bx bx-heart'></i> ${formatNumber(data.likes)}</p>` : ''}
+        <h3>${escapeHtml(data.title || 'TikTok Video')}</h3>
+        ${data.author ? `<p>@${escapeHtml(data.author)}</p>` : ''}
+        ${data.duration ? `<p>${escapeHtml(data.duration)}s</p>` : ''}
+        ${data.likes ? `<p>${formatNumber(data.likes)} likes</p>` : ''}
     </div>
 `;
 
@@ -231,9 +185,7 @@ const buildPhotoResult = (data) => {
             ${images.map((img, i) => `
                 <div class="photo-item">
                     <img src="${img}" alt="Slide ${i + 1}" loading="lazy">
-                    <button class="btn-photo-dl" data-url="${img}" data-name="TikDL_Slide_${randomId}_${i + 1}.jpg" aria-label="Download slide ${i + 1}">
-                        <i class='bx bx-download'></i>
-                    </button>
+                    <button class="btn-photo-dl" data-url="${img}" data-name="TikDL_Slide_${randomId}_${i + 1}.jpg" aria-label="Download slide ${i + 1}">Save</button>
                 </div>
             `).join('')}
         </div>
@@ -246,14 +198,14 @@ const buildPhotoResult = (data) => {
     if (data.audioUrl) {
         buttons.push(createDownloadButton(
             data.audioUrl, `TikDL_Audio_${randomId}.mp3`,
-            "bx-music", " Audio Only"
+            "Download audio"
         ));
     }
 
     const downloadSection = `
         <div class="download-section">
             <div class="download-options">${buttons.join('')}</div>
-            <p class="download-hint"><i class='bx bx-info-circle'></i> Tap a slide to download it individually</p>
+            <p class="download-hint">Use Save on a slide to download it individually.</p>
         </div>
     `;
 
@@ -268,19 +220,17 @@ const createDownloadAllPhotosButton = (images, randomId) => {
         btn.addEventListener('click', async (e) => {
             e.preventDefault();
             btn.disabled = true;
-            const originalText = btn.innerHTML;
+            const originalText = btn.textContent;
             for (let i = 0; i < images.length; i++) {
-                btn.innerHTML = `<i class='bx bx-download'></i> Downloading ${i + 1}/${images.length}…`;
+                btn.textContent = `Downloading ${i + 1}/${images.length}…`;
                 await directDownload(images[i], `TikDL_Slide_${randomId}_${i + 1}.jpg`);
                 await new Promise(r => setTimeout(r, 400)); // avoid browser blocking multi-downloads
             }
-            btn.innerHTML = originalText;
+            btn.textContent = originalText;
             btn.disabled = false;
         });
     }, 100);
-    return `<button id="${buttonId}" class="btn btn-hd">
-        <i class='bx bx-download'></i> Download All (${images.length})
-    </button>`;
+    return `<button id="${buttonId}" class="btn btn-hd">Download all (${images.length})</button>`;
 };
 
 // Event delegation for individual slide download buttons
@@ -312,28 +262,28 @@ const buildVideoResult = (data) => {
     if (data.videoUrl) {
         buttons.push(createDownloadButton(
             data.videoUrl, `TikDL_HD_${randomId}.mp4`,
-            "bx-download", " Download HD", "btn-hd"
+            "Download HD", "btn-hd"
         ));
     }
 
     if (data.videoUrlSD && data.videoUrlSD !== data.videoUrl) {
         buttons.push(createDownloadButton(
             data.videoUrlSD, `TikDL_SD_${randomId}.mp4`,
-            "bx-download", " Download SD"
+            "Download SD"
         ));
     }
 
     if (data.audioUrl) {
         buttons.push(createDownloadButton(
             data.audioUrl, `TikDL_Audio_${randomId}.mp3`,
-            "bx-music", " Audio Only"
+            "Download audio"
         ));
     }
 
     const downloadSection = `
         <div class="download-section">
             <div class="download-options">${buttons.join('')}</div>
-            <p class="download-hint"><i class='bx bx-info-circle'></i> Tap to download directly</p>
+            
         </div>
     `;
 
@@ -379,23 +329,37 @@ urlInput.addEventListener('focus', () => {
     if (content.querySelector('.messageError')) showInstructions();
 });
 
+// Clear Button
+const clearBtn = document.getElementById('clearBtn');
+const syncClear = () => {
+    const hasValue = Boolean(urlInput.value);
+    clearBtn.hidden = !hasValue;
+    pasteBtn.hidden = hasValue;
+};
+
+urlInput.addEventListener('input', syncClear);
+clearBtn.addEventListener('click', () => {
+    urlInput.value = '';
+    syncClear();
+    urlInput.focus();
+    showInstructions();
+});
+
 // Paste Button
 const pasteBtn = document.getElementById('pasteBtn');
+const ICON_PASTE = '<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="8" y="3" width="8" height="4" rx="1"/><path d="M16 5h2a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2h2"/></svg>';
+const ICON_CHECK = '<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>';
 
 pasteBtn.addEventListener('click', async () => {
     try {
         const text = await navigator.clipboard.readText();
         if (!text) return;
         urlInput.value = text.trim();
+        syncClear();
         urlInput.focus();
 
-        pasteBtn.classList.add('pasted');
-        const icon = pasteBtn.querySelector('i');
-        icon.className = 'bx bx-check';
-        setTimeout(() => {
-            icon.className = 'bx bx-paste';
-            pasteBtn.classList.remove('pasted');
-        }, 1000);
+        pasteBtn.innerHTML = ICON_CHECK;
+        setTimeout(() => { pasteBtn.innerHTML = ICON_PASTE; }, 1000);
 
         if (isValidTikTokUrl(urlInput.value.trim())) {
             form.dispatchEvent(new Event('submit'));

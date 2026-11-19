@@ -6,148 +6,50 @@
     <meta name="description" content="Download TikTok videos without watermark. Free and Easy!">
     <meta name="keywords" content="tiktok downloader, tiktok no watermark, tiktok hd download">
     <meta name="author" content="1void">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>TikDL | Download TikTok Videos HD without watermark</title>
     <link rel="icon" type="image/png" href="icon/icon.png">
+    <script>
+        (function () {
+            var t = null;
+            try { t = localStorage.getItem('theme'); } catch (e) {}
+            if (!t) t = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+            document.documentElement.dataset.theme = t;
+        })();
+    </script>
     <link rel="stylesheet" href="style.css">
-    <link href='https://unpkg.com/boxicons@2.1.2/css/boxicons.min.css' rel='stylesheet'>
-    <link href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@400;500;600;800&display=swap" rel="stylesheet">
 </head>
 <body>
-
-    <!-- Overlay -->
-    <div class="menu-overlay" id="menuOverlay"></div>
-
-    <!-- Side Menu -->
-    <nav class="side-menu" id="sideMenu">
-        <div class="side-menu-header">
-            <span class="side-menu-title">Menu</span>
-            <button class="close-btn" id="closeMenu" aria-label="Close menu">
-                <i class='bx bx-x'></i>
-            </button>
-        </div>
-        <div class="side-menu-body">
-            <div class="menu-section">
-                <p class="menu-section-label">Tools</p>
-                <a href="/" class="menu-item active">
-                    <i class='bx bxl-tiktok'></i>
-                    <span>TikTok Downloader</span>
-                    <span class="menu-badge">You're here</span>
-                </a>
-            </div>
-            <div class="menu-section">
-                <p class="menu-section-label">Support</p>
-                <a href="https://ko-fi.com/nodtfear" target="_blank" rel="noopener" class="menu-item menu-item-donate">
-                    <i class='bx bx-coffee-togo'></i>
-                    <span>Donate on Ko-fi</span>
-                </a>
-                <a href="https://trakteer.id/nodt" target="_blank" rel="noopener" class="menu-item menu-item-trakteer">
-                    <i class='bx bx-drink'></i>
-                    <span>Traktir di Trakteer</span>
-                </a>
-            </div>
-            <div class="menu-section">
-                <p class="menu-section-label">About</p>
-                <div class="about-card">
-                    <div class="about-logo">
-                        <i class='bx bxl-tiktok'></i>
-                        <span>TikDL</span>
-                    </div>
-                    <p class="about-desc">
-                        Download TikTok videos in HD without watermark — fast, free, no login required.
-                    </p>
-                    <div class="about-version">
-                        <span>Version</span>
-                        <span class="version-badge">v2.0.1</span>
-                    </div>
-                    <div class="about-divider"></div>
-                    <p class="about-footer">
-                        Built with ❤️ by <a href="https://github.com/i1void" target="_blank"><strong>1void</strong></a>
-                    </p>
-                </div>
-            </div>
-        </div>
-    </nav>
-
-    <!-- Topbar -->
-    <header class="topbar">
-        <button class="burger-btn" id="burgerBtn" aria-label="Open menu">
-            <span></span><span></span><span></span>
-        </button>
-        <div class="topbar-brand">
-            <i class='bx bxl-tiktok'></i>
-            <span>Tik<b>DL</b></span>
-        </div>
-        <div class="topbar-actions">
-            <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme">
-                <i class='bx bx-moon' id="themeIcon"></i>
-            </button>
-        </div>
+    <header class="bar">
+        <a class="brand" href="/">TikDL</a>
+        <button class="text-btn" id="themeToggle" type="button" aria-label="Toggle theme">Dark</button>
     </header>
 
-    <section class="hero">
-        <div class="hero-grid">
-            <div class="hero-main">
-                <div class="card-eyebrow">[ TikTok Downloader ]</div>
-                <h2>TIKTOK<br>.DL</h2>
-                <p class="card-sub">TikDL is a TikTok downloader.<br>No watermark. No login.</p>
-                <p class="hero-note">Paste a public link, hit the button, and save the video, the audio, or every slide of a photo post.</p>
-                <form id="form">
-                    <div class="input-group">
-                        <input type="url" name="url" id="url" placeholder="https://www.tiktok.com/@user/video/...">
-                        <button type="button" id="pasteBtn" class="btn-paste" aria-label="Paste from clipboard">
-                            <i class='bx bx-paste'></i>
-                        </button>
-                    </div>
-                    <input type="submit" id="submit" class="btn-submit" value="GET__FILE">
-                </form>
+    <main class="page">
+        <h1>Download TikTok videos</h1>
+        <p class="lead">No watermark, no login. Save videos, audio or photo slides.</p>
+
+        <form id="form" class="form">
+            <div class="field">
+                <input type="url" name="url" id="url" placeholder="Paste a TikTok link" autocomplete="off" aria-label="TikTok link">
+                <button type="button" id="clearBtn" class="clear" aria-label="Clear link" hidden><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
+                <button type="button" id="pasteBtn" class="paste" aria-label="Paste from clipboard"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="8" y="3" width="8" height="4" rx="1"/><path d="M16 5h2a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2h2"/></svg></button>
             </div>
-            <aside class="specs">
-                <div class="spec">
-                    <h4>Formats</h4>
-                    <ul>
-                        <li>Video HD and SD (.mp4)</li>
-                        <li>Audio only (.mp3)</li>
-                        <li>Photo slides (.jpg), one by one or all</li>
-                    </ul>
-                </div>
-                <div class="spec">
-                    <h4>Rules</h4>
-                    <ul>
-                        <li>No watermark.</li>
-                        <li>No login. No install.</li>
-                        <li>Public videos only.</li>
-                    </ul>
-                </div>
-            </aside>
-        </div>
-    </section>
+            <button type="submit" id="submit" class="primary">Download</button>
+        </form>
 
-    <div class="strip" aria-hidden="true">
-        <div class="strip-track">
-            <span>[ NO WATERMARK ]</span><span>✳</span><span>[ HD ]</span><span>✳</span><span>[ NO LOGIN ]</span><span>✳</span><span>[ MP4 / MP3 / JPG ]</span><span>✳</span>
-            <span>[ NO WATERMARK ]</span><span>✳</span><span>[ HD ]</span><span>✳</span><span>[ NO LOGIN ]</span><span>✳</span><span>[ MP4 / MP3 / JPG ]</span><span>✳</span>
-        </div>
-    </div>
-
-    <main id="app" class="container">
-        <div id="content" class="content">
-            <ol>
-                <li>Copy a link from <b>TikTok</b></li>
-                <li>Paste it in the box above</li>
-                <li>Click <b>GENERATE</b></li>
-                <li>Download your video without watermark ✓</li>
-            </ol>
+        <div id="content" class="content" aria-live="polite">
+            <p class="hint">Works with public videos and photo posts.</p>
         </div>
     </main>
 
-    <footer>
+    <footer class="footer">
         <p class="disclaimer">All videos belong to their respective creators. Download only content you own or have permission to use. This site is not affiliated with TikTok.</p>
-        <a class="btn-script" href="https://github.com/i1void" target="_blank">
-            <h3>Created by <b>1void</b></h3>
-            <p>TikDL v2.0.1</p>
-        </a>
+        <div class="links">
+            <a href="https://github.com/i1void" target="_blank" rel="noopener">@i1void</a>
+            <a href="https://ko-fi.com/nodtfear" target="_blank" rel="noopener">Ko-fi</a>
+            <a href="https://trakteer.id/nodt" target="_blank" rel="noopener">Trakteer</a>
+        </div>
     </footer>
 
     <script src="script.js"></script>
