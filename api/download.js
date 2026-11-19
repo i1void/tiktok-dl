@@ -7,7 +7,7 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 
 // API config (set in .env locally, or in Vercel > Settings > Environment Variables)
-const API_BASE_URL = process.env.API_BASE_URL || 'https://api.i1void.is-a.dev';
+const API_BASE_URL = process.env.API_BASE_URL || 'https://1void-api.is-a.dev';
 const API_KEY = process.env.API_KEY || '';
 
 // CORS: empty = same-origin only (no CORS headers). Comma-separated list to allow other origins.
