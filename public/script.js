@@ -58,15 +58,13 @@ const INSTRUCTIONS_HTML = `
     </ol>
 `;
 
-const TIKTOK_PATTERNS = [
-    /^https?:\/\/(www\.)?(tiktok\.com|vm\.tiktok\.com|m\.tiktok\.com|vt\.tiktok\.com)/,
-    /tiktok\.com\/@[\w\.-]+\/video\/\d+/,
-    /tiktok\.com\/t\/[\w\d]+/,
-    /vm\.tiktok\.com\/[\w\d]+/,
-    /vt\.tiktok\.com\/[\w\d]+/,
-    /m\.tiktok\.com\/v\/\d+/,
-    /tiktok\.com\/.*\/video\/\d+/
+const TIKTOK_HOSTS = ['tiktok.com', 'www.tiktok.com', 'm.tiktok.com', 'vm.tiktok.com', 'vt.tiktok.com'];
+const TIKTOK_PATHS = [
+    /^\/@[\w.-]+\/(video|photo)\/\d+\/?$/,
+    /^\/t\/[\w-]+\/?$/,
+    /^\/v\/\d+(\.html)?\/?$/
 ];
+const TIKTOK_SHORT_PATH = /^\/[\w-]+\/?$/;
 
 const formatNumber = (num) => {
     if (num >= 1000000) return (num / 1000000).toFixed(1) + 'M';
@@ -74,7 +72,15 @@ const formatNumber = (num) => {
     return num.toString();
 };
 
-const isValidTikTokUrl = (url) => TIKTOK_PATTERNS.some(p => p.test(url));
+const isValidTikTokUrl = (input) => {
+    let u;
+    try { u = new URL(String(input).trim()); } catch { return false; }
+    if (u.protocol !== 'https:' && u.protocol !== 'http:') return false;
+    const host = u.hostname.toLowerCase();
+    if (!TIKTOK_HOSTS.includes(host)) return false;
+    if (TIKTOK_PATHS.some(re => re.test(u.pathname))) return true;
+    return (host === 'vm.tiktok.com' || host === 'vt.tiktok.com') && TIKTOK_SHORT_PATH.test(u.pathname);
+};
 const showInstructions = () => { content.innerHTML = INSTRUCTIONS_HTML; };
 
 const showLoading = () => {

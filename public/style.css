@@ -215,7 +215,8 @@ body:not(.light) .strip { background: rgba(255,255,255,.05); }
 .messageError i { font-size: 1.1rem; color: var(--accent); flex-shrink: 0; }
 
 /* ---------- Footer ---------- */
-footer { display: flex; justify-content: center; padding: 2rem 1rem 2.2rem; }
+footer { display: flex; flex-direction: column; align-items: center; gap: 1rem; padding: 2rem 1rem 2.2rem; }
+footer .disclaimer { max-width: 28rem; text-align: center; font-size: .66rem; line-height: 1.5; letter-spacing: .02em; text-transform: none; color: var(--muted); }
 .btn-script { text-decoration: none; text-align: center; }
 footer h3 { font-weight: 600; font-size: .72rem; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
 footer b { color: var(--ink); font-weight: 800; }
