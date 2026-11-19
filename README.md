@@ -42,7 +42,7 @@ Visit `http://localhost:3000` to view the application.
 | Variable       | Required | Default                          | Description                            |
 | -------------- | -------- | -------------------------------- | -------------------------------------- |
 | `API_KEY`      | No       | -                                | Optional API key for the 1void API     |
-| `API_BASE_URL` | No       | `https://api.i1void.is-a.dev`    | Base URL of the downloader API         |
+| `API_BASE_URL` | No       | `https://1void-api.is-a.dev`    | Base URL of the downloader API         |
 | `ALLOWED_ORIGINS` | No    | empty (same-origin only)         | Comma-separated origins allowed by CORS |
 | `CACHE_TTL_SECONDS` | No  | `300`                            | How long results are cached per URL    |
 | `PORT`         | No       | `3000`                           | Port for local server                  |
@@ -57,7 +57,7 @@ GET /api/download?url=<tiktok_url>
 
 ## Powered By
 
-This app uses the 1void API (`api.i1void.is-a.dev`) to fetch and process TikTok video data.
+This app uses the 1void API (`1void-api.is-a.dev`) to fetch and process TikTok video data.
 
 ## Notes
 
